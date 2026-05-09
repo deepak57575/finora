@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finora Finance Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Open menu" aria-controls="app-sidebar" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>
+    <div class="app-shell">
+      <aside class="sidebar" id="app-sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">F</div>
+          <div>
+            <p class="brand-name">Finora</p>
+            <p class="brand-subtitle">Personal finance</p>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" data-section="dashboard" type="button">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" data-section="planner" type="button">
+            <span class="nav-icon">▦</span>
+            <span>Monthly Planner</span>
+          </button>
+          <button class="nav-item" data-section="loans" type="button">
+            <span class="nav-icon">↔</span>
+            <span>Loan Tracker</span>
+          </button>
+          <button class="nav-item" data-section="emi" type="button">
+            <span class="nav-icon">◷</span>
+            <span>EMI Tracker</span>
+          </button>
+          <button class="nav-item" data-section="goals" type="button">
+            <span class="nav-icon">◎</span>
+            <span>Saving Goals</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-note">
+          <p>Monthly snapshot</p>
+          <strong id="sidebar-balance">₹0</strong>
+          <span>Projected balance</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Money command center</p>
+            <h1 id="page-title">Dashboard</h1>
+          </div>
+          <div class="topbar-actions">
+            <label class="month-picker">
+              <span>Month</span>
+              <input id="active-month" type="month" />
+            </label>
+            <button class="ghost-button" id="reset-demo" type="button">Reset demo</button>
+          </div>
+        </header>
+
+        <section class="section-view active" id="dashboard">
+          <div class="metric-grid">
+            <article class="metric">
+              <span>Monthly income</span>
+              <strong id="dash-income">₹0</strong>
+              <small id="dash-income-sub">0 income entries</small>
+            </article>
+            <article class="metric">
+              <span>Total expenses</span>
+              <strong id="dash-expenses">₹0</strong>
+              <small id="dash-expense-sub">0 expense entries</small>
+            </article>
+            <article class="metric">
+              <span>EMIs due</span>
+              <strong id="dash-emi">₹0</strong>
+              <small id="dash-emi-sub">0 active EMIs</small>
+            </article>
+            <article class="metric accent">
+              <span>Available balance</span>
+              <strong id="dash-balance">₹0</strong>
+              <small>Income minus expenses and EMIs</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel wide">
+              <div class="panel-header">
+                <div>
+                  <h2>Budget health</h2>
+                  <p>Expense categories against monthly income</p>
+                </div>
+              </div>
+              <div id="category-bars" class="bar-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Loan position</h2>
+                  <p>Given and taken balances</p>
+                </div>
+              </div>
+              <div class="loan-summary">
+                <div>
+                  <span>Money to receive</span>
+                  <strong id="loan-given">₹0</strong>
+                </div>
+                <div>
+                  <span>Money to repay</span>
+                  <strong id="loan-taken">₹0</strong>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Goal progress</h2>
+                  <p>Saving plans for upcoming purchases</p>
+                </div>
+              </div>
+              <div id="goal-preview" class="goal-preview"></div>
+            </section>
+
+            <section class="panel wide">
+              <div class="panel-header">
+                <div>
+                  <h2>Upcoming EMI dates</h2>
+                  <p>Payments sorted by due day</p>
+                </div>
+              </div>
+              <div id="emi-preview" class="compact-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="section-view" id="planner">
+          <div class="workspace-grid">
+            <form class="panel form-panel" id="transaction-form">
+              <div class="panel-header">
+                <div>
+                  <h2>Add income or expense</h2>
+                  <p>Plan this month and track actual spending</p>
+                </div>
+              </div>
+              <div class="field-row">
+                <label>Type
+                  <select name="type" required>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </label>
+                <label>Amount
+                  <input name="amount" type="number" min="1" step="1" placeholder="25000" required />
+                </label>
+              </div>
+              <label>Category
+                <input name="category" type="text" placeholder="Salary, groceries, rent" required />
+              </label>
+              <label>Note
+                <input name="note" type="text" placeholder="Optional detail" />
+              </label>
+              <button class="primary-button" type="submit">Add entry</button>
+            </form>
+
+            <section class="panel list-panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Monthly entries</h2>
+                  <p>Income and expense records for selected month</p>
+                </div>
+              </div>
+              <div id="transaction-list" class="data-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="section-view" id="loans">
+          <div class="workspace-grid">
+            <form class="panel form-panel" id="loan-form">
+              <div class="panel-header">
+                <div>
+                  <h2>Add loan</h2>
+                  <p>Track money given to others or borrowed from others</p>
+                </div>
+              </div>
+              <div class="field-row">
+                <label>Direction
+                  <select name="direction" required>
+                    <option value="given">Given</option>
+                    <option value="taken">Taken</option>
+                  </select>
+                </label>
+                <label>Amount
+                  <input name="amount" type="number" min="1" step="1" placeholder="10000" required />
+                </label>
+              </div>
+              <label>Person
+                <input name="person" type="text" placeholder="Name" required />
+              </label>
+              <label>Due date
+                <input name="dueDate" type="date" required />
+              </label>
+              <label>Status
+                <select name="status">
+                  <option value="open">Open</option>
+                  <option value="settled">Settled</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">Add loan</button>
+            </form>
+
+            <section class="panel list-panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Loan records</h2>
+                  <p>Open and settled personal loans</p>
+                </div>
+              </div>
+              <div id="loan-list" class="data-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="section-view" id="emi">
+          <div class="workspace-grid">
+            <form class="panel form-panel" id="emi-form">
+              <div class="panel-header">
+                <div>
+                  <h2>Add EMI</h2>
+                  <p>Keep recurring loan payments visible</p>
+                </div>
+              </div>
+              <label>Item or loan name
+                <input name="name" type="text" placeholder="Car loan, phone, home loan" required />
+              </label>
+              <div class="field-row">
+                <label>Monthly EMI
+                  <input name="amount" type="number" min="1" step="1" placeholder="8500" required />
+                </label>
+                <label>Due day
+                  <input name="dueDay" type="number" min="1" max="31" placeholder="5" required />
+                </label>
+              </div>
+              <div class="field-row">
+                <label>Months left
+                  <input name="monthsLeft" type="number" min="1" step="1" placeholder="18" required />
+                </label>
+                <label>Status
+                  <select name="status">
+                    <option value="active">Active</option>
+                    <option value="paused">Paused</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </label>
+              </div>
+              <button class="primary-button" type="submit">Add EMI</button>
+            </form>
+
+            <section class="panel list-panel">
+              <div class="panel-header">
+                <div>
+                  <h2>EMI schedule</h2>
+                  <p>Recurring payments and remaining commitment</p>
+                </div>
+              </div>
+              <div id="emi-list" class="data-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="section-view" id="goals">
+          <div class="workspace-grid">
+            <form class="panel form-panel" id="goal-form">
+              <div class="panel-header">
+                <div>
+                  <h2>Add saving goal</h2>
+                  <p>Plan purchases and track how much is saved</p>
+                </div>
+              </div>
+              <label>Goal
+                <input name="name" type="text" placeholder="Laptop, vacation, bike" required />
+              </label>
+              <div class="field-row">
+                <label>Target amount
+                  <input name="target" type="number" min="1" step="1" placeholder="75000" required />
+                </label>
+                <label>Saved so far
+                  <input name="saved" type="number" min="0" step="1" placeholder="15000" required />
+                </label>
+              </div>
+              <label>Target date
+                <input name="targetDate" type="date" required />
+              </label>
+              <button class="primary-button" type="submit">Add goal</button>
+            </form>
+
+            <section class="panel list-panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Saving plans</h2>
+                  <p>Purchase goals with progress and monthly need</p>
+                </div>
+              </div>
+              <div id="goal-list" class="data-list"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
