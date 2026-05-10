@@ -13,6 +13,7 @@
       <span></span>
     </button>
     <div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>
+
     <div class="app-shell">
       <aside class="sidebar" id="app-sidebar" aria-label="Primary navigation">
         <div class="brand">
@@ -51,6 +52,14 @@
           <strong id="sidebar-balance">₹0</strong>
           <span>Projected balance</span>
         </div>
+
+        <div class="theme-control">
+          <span>Appearance</span>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <strong id="theme-label">Light</strong>
+          </button>
+        </div>
       </aside>
 
       <main class="main-content">
@@ -64,7 +73,6 @@
               <span>Month</span>
               <input id="active-month" type="month" />
             </label>
-            <button class="ghost-button" id="reset-demo" type="button">Reset demo</button>
           </div>
         </header>
 
@@ -145,178 +153,256 @@
         </section>
 
         <section class="section-view" id="planner">
-          <div class="workspace-grid">
-            <form class="panel form-panel" id="transaction-form">
-              <div class="panel-header">
-                <div>
-                  <h2>Add income or expense</h2>
-                  <p>Plan this month and track actual spending</p>
-                </div>
-              </div>
-              <div class="field-row">
-                <label>Type
-                  <select name="type" required>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                  </select>
-                </label>
-                <label>Amount
-                  <input name="amount" type="number" min="1" step="1" placeholder="25000" required />
-                </label>
-              </div>
-              <label>Category
-                <input name="category" type="text" placeholder="Salary, groceries, rent" required />
-              </label>
-              <label>Note
-                <input name="note" type="text" placeholder="Optional detail" />
-              </label>
-              <button class="primary-button" type="submit">Add entry</button>
-            </form>
-
-            <section class="panel list-panel">
-              <div class="panel-header">
-                <div>
-                  <h2>Monthly entries</h2>
-                  <p>Income and expense records for selected month</p>
-                </div>
-              </div>
-              <div id="transaction-list" class="data-list"></div>
-            </section>
+          <div class="page-actions">
+            <button class="primary-button" data-open-modal="transaction-modal" data-mode="create" type="button">Add entry</button>
           </div>
+          <section class="panel list-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Monthly entries</h2>
+                <p>Income, expenses, EMI settlements, and recurring plans</p>
+              </div>
+            </div>
+            <div id="transaction-list" class="data-list"></div>
+          </section>
         </section>
 
         <section class="section-view" id="loans">
-          <div class="workspace-grid">
-            <form class="panel form-panel" id="loan-form">
-              <div class="panel-header">
-                <div>
-                  <h2>Add loan</h2>
-                  <p>Track money given to others or borrowed from others</p>
-                </div>
-              </div>
-              <div class="field-row">
-                <label>Direction
-                  <select name="direction" required>
-                    <option value="given">Given</option>
-                    <option value="taken">Taken</option>
-                  </select>
-                </label>
-                <label>Amount
-                  <input name="amount" type="number" min="1" step="1" placeholder="10000" required />
-                </label>
-              </div>
-              <label>Person
-                <input name="person" type="text" placeholder="Name" required />
-              </label>
-              <label>Due date
-                <input name="dueDate" type="date" required />
-              </label>
-              <label>Status
-                <select name="status">
-                  <option value="open">Open</option>
-                  <option value="settled">Settled</option>
-                </select>
-              </label>
-              <button class="primary-button" type="submit">Add loan</button>
-            </form>
-
-            <section class="panel list-panel">
-              <div class="panel-header">
-                <div>
-                  <h2>Loan records</h2>
-                  <p>Open and settled personal loans</p>
-                </div>
-              </div>
-              <div id="loan-list" class="data-list"></div>
-            </section>
+          <div class="page-actions">
+            <button class="primary-button" data-open-modal="loan-modal" data-mode="create" type="button">Add loan</button>
           </div>
+          <section class="panel list-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Loan records</h2>
+                <p>Open and settled personal loans</p>
+              </div>
+            </div>
+            <div id="loan-list" class="data-list"></div>
+          </section>
         </section>
 
         <section class="section-view" id="emi">
-          <div class="workspace-grid">
-            <form class="panel form-panel" id="emi-form">
-              <div class="panel-header">
-                <div>
-                  <h2>Add EMI</h2>
-                  <p>Keep recurring loan payments visible</p>
-                </div>
-              </div>
-              <label>Item or loan name
-                <input name="name" type="text" placeholder="Car loan, phone, home loan" required />
-              </label>
-              <div class="field-row">
-                <label>Monthly EMI
-                  <input name="amount" type="number" min="1" step="1" placeholder="8500" required />
-                </label>
-                <label>Due day
-                  <input name="dueDay" type="number" min="1" max="31" placeholder="5" required />
-                </label>
-              </div>
-              <div class="field-row">
-                <label>Months left
-                  <input name="monthsLeft" type="number" min="1" step="1" placeholder="18" required />
-                </label>
-                <label>Status
-                  <select name="status">
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="closed">Closed</option>
-                  </select>
-                </label>
-              </div>
-              <button class="primary-button" type="submit">Add EMI</button>
-            </form>
-
-            <section class="panel list-panel">
-              <div class="panel-header">
-                <div>
-                  <h2>EMI schedule</h2>
-                  <p>Recurring payments and remaining commitment</p>
-                </div>
-              </div>
-              <div id="emi-list" class="data-list"></div>
-            </section>
+          <div class="page-actions">
+            <button class="primary-button" data-open-modal="emi-modal" data-mode="create" type="button">Add EMI</button>
           </div>
+          <section class="panel list-panel">
+            <div class="panel-header">
+              <div>
+                <h2>EMI schedule</h2>
+                <p>Recurring payments and remaining commitment</p>
+              </div>
+            </div>
+            <div id="emi-list" class="data-list"></div>
+          </section>
         </section>
 
         <section class="section-view" id="goals">
-          <div class="workspace-grid">
-            <form class="panel form-panel" id="goal-form">
-              <div class="panel-header">
-                <div>
-                  <h2>Add saving goal</h2>
-                  <p>Plan purchases and track how much is saved</p>
-                </div>
-              </div>
-              <label>Goal
-                <input name="name" type="text" placeholder="Laptop, vacation, bike" required />
-              </label>
-              <div class="field-row">
-                <label>Target amount
-                  <input name="target" type="number" min="1" step="1" placeholder="75000" required />
-                </label>
-                <label>Saved so far
-                  <input name="saved" type="number" min="0" step="1" placeholder="15000" required />
-                </label>
-              </div>
-              <label>Target date
-                <input name="targetDate" type="date" required />
-              </label>
-              <button class="primary-button" type="submit">Add goal</button>
-            </form>
-
-            <section class="panel list-panel">
-              <div class="panel-header">
-                <div>
-                  <h2>Saving plans</h2>
-                  <p>Purchase goals with progress and monthly need</p>
-                </div>
-              </div>
-              <div id="goal-list" class="data-list"></div>
-            </section>
+          <div class="page-actions">
+            <button class="primary-button" data-open-modal="goal-modal" data-mode="create" type="button">Add goal</button>
           </div>
+          <section class="panel list-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Saving plans</h2>
+                <p>Purchase goals with progress and monthly need</p>
+              </div>
+            </div>
+            <div id="goal-list" class="data-list"></div>
+          </section>
         </section>
       </main>
+    </div>
+
+    <div class="modal-layer" id="transaction-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="transaction-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Monthly planner</p>
+            <h2 id="transaction-modal-title">Add entry</h2>
+          </div>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">×</button>
+        </div>
+        <form class="form-panel" id="transaction-form">
+          <input name="id" type="hidden" />
+          <div class="field-row">
+            <label>Type
+              <select name="type" required>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+            </label>
+            <label>Entry kind
+              <select name="entryKind" required>
+                <option value="regular">Regular entry</option>
+                <option value="emi-settlement">EMI settlement</option>
+                <option value="loan-settlement">Loan settlement</option>
+                <option value="goal-saving">Saving goal deposit</option>
+              </select>
+            </label>
+          </div>
+          <label class="conditional-field" id="emi-select-field">Select EMI
+            <select name="emiId"></select>
+          </label>
+          <div class="conditional-field" id="loan-select-field">
+            <div class="field-row">
+              <label>Select loan
+                <select name="loanId"></select>
+              </label>
+              <label>Settlement
+                <select name="loanSettlementType">
+                  <option value="partial">Partial</option>
+                  <option value="full">Full</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <label class="conditional-field" id="goal-select-field">Select saving goal
+            <select name="goalId"></select>
+          </label>
+          <div class="field-row">
+            <label>Amount
+              <input name="amount" type="number" min="1" step="1" placeholder="25000" required />
+            </label>
+            <label>Category
+              <input name="category" type="text" placeholder="Salary, groceries, rent" required />
+            </label>
+          </div>
+          <label>Note
+            <input name="note" type="text" placeholder="Optional detail" />
+          </label>
+          <div class="recurring-box">
+            <label class="checkbox-label">
+              <input name="isRecurring" type="checkbox" />
+              <span>Recurring payment</span>
+            </label>
+            <div class="recurring-settings" id="recurring-settings">
+              <div class="field-row">
+                <label>Repeats
+                  <select name="recurringUnit">
+                    <option value="day">Daily</option>
+                    <option value="week">Weekly</option>
+                    <option value="month" selected>Monthly</option>
+                    <option value="year">Yearly</option>
+                  </select>
+                </label>
+                <label>Every
+                  <input name="recurringInterval" type="number" min="1" step="1" value="1" />
+                </label>
+              </div>
+            </div>
+          </div>
+          <button class="primary-button" type="submit">Save entry</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="loan-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="loan-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Loan tracker</p>
+            <h2 id="loan-modal-title">Add loan</h2>
+          </div>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">×</button>
+        </div>
+        <form class="form-panel" id="loan-form">
+          <input name="id" type="hidden" />
+          <div class="field-row">
+            <label>Direction
+              <select name="direction" required>
+                <option value="given">Given</option>
+                <option value="taken">Taken</option>
+              </select>
+            </label>
+            <label>Amount
+              <input name="amount" type="number" min="1" step="1" placeholder="10000" required />
+            </label>
+          </div>
+          <label>Person
+            <input name="person" type="text" placeholder="Name" required />
+          </label>
+          <label>Due date
+            <input name="dueDate" type="date" required />
+          </label>
+          <label>Status
+            <select name="status">
+              <option value="open">Open</option>
+              <option value="settled">Settled</option>
+            </select>
+          </label>
+          <button class="primary-button" type="submit">Save loan</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="emi-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="emi-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">EMI tracker</p>
+            <h2 id="emi-modal-title">Add EMI</h2>
+          </div>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">×</button>
+        </div>
+        <form class="form-panel" id="emi-form">
+          <input name="id" type="hidden" />
+          <label>Item or loan name
+            <input name="name" type="text" placeholder="Car loan, phone, home loan" required />
+          </label>
+          <div class="field-row">
+            <label>Monthly EMI
+              <input name="amount" type="number" min="1" step="1" placeholder="8500" required />
+            </label>
+            <label>Due day
+              <input name="dueDay" type="number" min="1" max="31" placeholder="5" required />
+            </label>
+          </div>
+          <div class="field-row">
+            <label>Months left
+              <input name="monthsLeft" type="number" min="1" step="1" placeholder="18" required />
+            </label>
+            <label>Status
+              <select name="status">
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="closed">Closed</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary-button" type="submit">Save EMI</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="goal-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="goal-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Saving goals</p>
+            <h2 id="goal-modal-title">Add goal</h2>
+          </div>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">×</button>
+        </div>
+        <form class="form-panel" id="goal-form">
+          <input name="id" type="hidden" />
+          <label>Goal
+            <input name="name" type="text" placeholder="Laptop, vacation, bike" required />
+          </label>
+          <div class="field-row">
+            <label>Target amount
+              <input name="target" type="number" min="1" step="1" placeholder="75000" required />
+            </label>
+            <label>Saved so far
+              <input name="saved" type="number" min="0" step="1" placeholder="15000" required />
+            </label>
+          </div>
+          <label>Target date
+            <input name="targetDate" type="date" required />
+          </label>
+          <button class="primary-button" type="submit">Save goal</button>
+        </form>
+      </div>
     </div>
 
     <script src="app.js"></script>
