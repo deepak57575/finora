@@ -31,6 +31,13 @@ const demoState = {
     { id: crypto.randomUUID(), name: "New laptop", target: 90000, saved: 36000, targetDate: "2026-10-20" },
     { id: crypto.randomUUID(), name: "Goa trip", target: 45000, saved: 18000, targetDate: "2026-08-15" },
   ],
+  categories: [
+    { id: crypto.randomUUID(), name: "Salary", type: "income", budget: 0 },
+    { id: crypto.randomUUID(), name: "Freelance", type: "income", budget: 0 },
+    { id: crypto.randomUUID(), name: "Rent", type: "expense", budget: 22000 },
+    { id: crypto.randomUUID(), name: "Groceries", type: "expense", budget: 12000 },
+    { id: crypto.randomUUID(), name: "Transport", type: "expense", budget: 6000 },
+  ],
 };
 
 let state = loadState();
@@ -46,6 +53,7 @@ function loadState() {
       loans: parsed.loans || [],
       emis: parsed.emis || [],
       goals: parsed.goals || [],
+      categories: parsed.categories || structuredClone(demoState.categories),
       activeMonth: parsed.activeMonth || currentMonth(),
     };
   } catch {
@@ -273,6 +281,28 @@ function renderGoals() {
     : `<div class="empty-state">No saving goals added yet.</div>`;
 }
 
+function renderCategories() {
+  $("#category-list").innerHTML = state.categories.length
+    ? state.categories
+        .map(
+          (category) => `
+            <article class="list-item">
+              <div>
+                <span class="pill">${category.type}</span>
+                <h3>${escapeHtml(category.name)}</h3>
+                <p>${category.budget ? `Monthly budget ${formatMoney(category.budget)}` : "No monthly budget set"}</p>
+              </div>
+              <div class="item-actions">
+                <button class="ghost-button" data-edit="categories" data-id="${category.id}" type="button">Edit</button>
+                <button class="danger-button" data-delete="categories" data-id="${category.id}" type="button">Delete</button>
+              </div>
+            </article>
+          `
+        )
+        .join("")
+    : `<div class="empty-state">No categories added yet.</div>`;
+}
+
 function goalCard(goal, includeActions) {
   const percent = progress(goal);
   const remaining = Math.max(Number(goal.target) - Number(goal.saved), 0);
@@ -329,6 +359,7 @@ function renderAll() {
   renderLoans();
   renderEmis();
   renderGoals();
+  renderCategories();
   bindDynamicActions();
 }
 
@@ -372,24 +403,26 @@ function bindDynamicActions() {
 function bindForms() {
   $("#transaction-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const id = form.get("id") || crypto.randomUUID();
     const entryKind = form.get("entryKind");
     const previous = state.transactions.find((entry) => entry.id === id);
     if (previous) applySettlementSideEffects(previous, -1);
+    const values = getTransactionDraft(formElement, entryKind);
 
     const record = {
       id,
       month: getExistingMonth("transactions", id) || state.activeMonth,
-      type: getTransactionType(entryKind, form.get("type")),
+      type: values.type,
       entryKind,
       emiId: entryKind === "emi-settlement" ? form.get("emiId") : "",
       loanId: entryKind === "loan-settlement" ? form.get("loanId") : "",
       loanSettlementType: entryKind === "loan-settlement" ? form.get("loanSettlementType") : "",
       goalId: entryKind === "goal-saving" ? form.get("goalId") : "",
-      amount: Number(form.get("amount")),
-      category: form.get("category").trim(),
-      note: form.get("note").trim(),
+      amount: values.amount,
+      category: values.category,
+      note: values.note,
       recurring: entryKind === "regular" && form.get("isRecurring")
         ? {
             unit: form.get("recurringUnit"),
@@ -453,6 +486,21 @@ function bindForms() {
     saveState();
     renderAll();
   });
+
+  $("#category-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const id = form.get("id") || crypto.randomUUID();
+    upsert("categories", {
+      id,
+      name: form.get("name").trim(),
+      type: form.get("type"),
+      budget: Number(form.get("budget")) || 0,
+    });
+    closeActiveModal();
+    saveState();
+    renderAll();
+  });
 }
 
 function upsert(collection, record) {
@@ -462,6 +510,43 @@ function upsert(collection, record) {
   } else {
     state[collection].push(record);
   }
+}
+
+function getTransactionDraft(form, entryKind) {
+  if (entryKind === "emi-settlement") {
+    return {
+      type: "expense",
+      amount: Number(form.elements.emiAmount.value),
+      category: form.elements.emiCategory.value.trim(),
+      note: form.elements.emiNote.value.trim(),
+    };
+  }
+
+  if (entryKind === "loan-settlement") {
+    const loan = state.loans.find((item) => item.id === form.elements.loanId.value);
+    return {
+      type: loan?.direction === "given" ? "income" : "expense",
+      amount: Number(form.elements.loanAmount.value),
+      category: form.elements.loanCategory.value.trim(),
+      note: form.elements.loanNote.value.trim(),
+    };
+  }
+
+  if (entryKind === "goal-saving") {
+    return {
+      type: "expense",
+      amount: Number(form.elements.goalAmount.value),
+      category: form.elements.goalCategory.value.trim(),
+      note: form.elements.goalNote.value.trim(),
+    };
+  }
+
+  return {
+    type: form.elements.type.value,
+    amount: Number(form.elements.amount.value),
+    category: form.elements.categorySelect.value,
+    note: form.elements.note.value.trim(),
+  };
 }
 
 function getExistingMonth(collection, id) {
@@ -531,9 +616,12 @@ function bindModals() {
   });
   transactionForm.elements.emiId.addEventListener("change", fillFromSelectedSpecialEntry);
   transactionForm.elements.loanId.addEventListener("change", fillFromSelectedSpecialEntry);
-  transactionForm.elements.loanSettlementType.addEventListener("change", fillFromSelectedSpecialEntry);
+  transactionForm.querySelectorAll('input[name="loanSettlementType"]').forEach((input) => {
+    input.addEventListener("change", fillFromSelectedSpecialEntry);
+  });
   transactionForm.elements.goalId.addEventListener("change", fillFromSelectedSpecialEntry);
   transactionForm.elements.isRecurring.addEventListener("change", updateRecurringControls);
+  transactionForm.elements.type.addEventListener("change", populateCategoryOptions);
 }
 
 function openCreateModal(modalId) {
@@ -558,6 +646,7 @@ function openEditModal(collection, id) {
   if (collection === "loans") fillLoanForm(item);
   if (collection === "emis") fillEmiForm(item);
   if (collection === "goals") fillGoalForm(item);
+  if (collection === "categories") fillCategoryForm(item);
 }
 
 function fillTransactionForm(item) {
@@ -572,14 +661,24 @@ function fillTransactionForm(item) {
   form.elements.loanId.value = item.loanId || "";
   form.elements.loanSettlementType.value = item.loanSettlementType || "partial";
   form.elements.goalId.value = item.goalId || "";
+  updateTransactionFormMode();
+  populateCategoryOptions();
   form.elements.amount.value = item.amount;
-  form.elements.category.value = item.category;
+  form.elements.categorySelect.value = item.category;
   form.elements.note.value = item.note || "";
+  form.elements.emiAmount.value = item.amount;
+  form.elements.emiCategory.value = item.category;
+  form.elements.emiNote.value = item.note || "";
+  form.elements.loanAmount.value = item.amount;
+  form.elements.loanCategory.value = item.category;
+  form.elements.loanNote.value = item.note || "";
+  form.elements.goalAmount.value = item.amount;
+  form.elements.goalCategory.value = item.category;
+  form.elements.goalNote.value = item.note || "";
   form.elements.isRecurring.checked = Boolean(item.recurring);
   form.elements.recurringUnit.value = item.recurring?.unit || "month";
   form.elements.recurringInterval.value = item.recurring?.interval || 1;
   modal.querySelector("h2").textContent = "Edit entry";
-  updateTransactionFormMode();
   updateRecurringControls();
   openModal(modal);
 }
@@ -625,6 +724,18 @@ function fillGoalForm(item) {
   openModal(modal);
 }
 
+function fillCategoryForm(item) {
+  const modal = $("#category-modal");
+  const form = $("#category-form");
+  form.reset();
+  form.elements.id.value = item.id;
+  form.elements.name.value = item.name;
+  form.elements.type.value = item.type;
+  form.elements.budget.value = item.budget || "";
+  modal.querySelector("h2").textContent = "Edit category";
+  openModal(modal);
+}
+
 function openModal(modal) {
   modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
@@ -645,6 +756,7 @@ function modalIdToTitle(modalId) {
     "loan-modal": "Add loan",
     "emi-modal": "Add EMI",
     "goal-modal": "Add goal",
+    "category-modal": "Add category",
   };
   return titles[modalId];
 }
@@ -653,6 +765,7 @@ function populateSpecialEntryOptions() {
   populateEmiOptions();
   populateLoanOptions();
   populateGoalOptions();
+  populateCategoryOptions();
 }
 
 function populateEmiOptions() {
@@ -677,16 +790,30 @@ function populateGoalOptions() {
     : `<option value="">No saving goals</option>`;
 }
 
+function populateCategoryOptions() {
+  const form = $("#transaction-form");
+  const selectedType = form.elements.type.value || "expense";
+  const matchingCategories = state.categories.filter((category) => category.type === selectedType);
+  const fallbackCategories = state.categories.length ? state.categories : demoState.categories;
+  const categories = matchingCategories.length ? matchingCategories : fallbackCategories;
+  form.elements.categorySelect.innerHTML = categories
+    .map((category) => `<option value="${escapeHtml(category.name)}">${escapeHtml(category.name)}</option>`)
+    .join("");
+}
+
 function updateTransactionFormMode() {
   const form = $("#transaction-form");
   const entryKind = form.elements.entryKind.value;
   const isRegular = entryKind === "regular";
+  $("#regular-entry-fields").classList.toggle("active", isRegular);
   $("#emi-select-field").classList.toggle("active", entryKind === "emi-settlement");
   $("#loan-select-field").classList.toggle("active", entryKind === "loan-settlement");
   $("#goal-select-field").classList.toggle("active", entryKind === "goal-saving");
-  form.elements.type.disabled = !isRegular;
-  form.elements.isRecurring.disabled = !isRegular;
-  if (!isRegular) {
+  setTransactionFieldRequirements(entryKind);
+  populateCategoryOptions();
+  if (isRegular) {
+    updateRecurringControls();
+  } else {
     form.elements.isRecurring.checked = false;
     updateRecurringControls();
     fillFromSelectedSpecialEntry();
@@ -699,26 +826,30 @@ function fillFromSelectedSpecialEntry() {
   if (entryKind === "emi-settlement") {
     const emi = state.emis.find((item) => item.id === form.elements.emiId.value);
     if (!emi) return;
-    form.elements.type.value = "expense";
-    form.elements.amount.value = emi.amount;
-    form.elements.category.value = emi.name;
-    form.elements.note.value = `EMI paid for ${emi.name}`;
+    form.elements.emiAmount.value = emi.amount;
+    form.elements.emiCategory.value = emi.name;
+    form.elements.emiNote.value = `EMI paid for ${emi.name}`;
   }
   if (entryKind === "loan-settlement") {
     const loan = state.loans.find((item) => item.id === form.elements.loanId.value);
     if (!loan) return;
     const isFull = form.elements.loanSettlementType.value === "full";
-    form.elements.type.value = loan.direction === "taken" ? "expense" : "income";
-    if (isFull) form.elements.amount.value = loan.amount;
-    form.elements.category.value = `Loan ${loan.direction}: ${loan.person}`;
-    form.elements.note.value = `${isFull ? "Full" : "Partial"} loan settlement`;
+    form.elements.loanAmount.value = isFull ? loan.amount : form.elements.loanAmount.value || "";
+    form.elements.loanAmount.readOnly = isFull;
+    form.elements.loanCategory.value = `Loan ${loan.direction}: ${loan.person}`;
+    form.elements.loanNote.value = `${isFull ? "Full" : "Partial"} loan settlement`;
   }
   if (entryKind === "goal-saving") {
     const goal = state.goals.find((item) => item.id === form.elements.goalId.value);
     if (!goal) return;
-    form.elements.type.value = "expense";
-    form.elements.category.value = goal.name;
-    form.elements.note.value = `Added savings for ${goal.name}`;
+    const percent = Math.min((Number(goal.saved) / Number(goal.target)) * 100, 100) || 0;
+    const remaining = Math.max(Number(goal.target) - Number(goal.saved), 0);
+    $("#goal-context").innerHTML = `
+      <strong>${formatMoney(goal.saved)} saved (${Math.round(percent)}%)</strong>
+      <span>Remaining ${formatMoney(remaining)} of ${formatMoney(goal.target)}</span>
+    `;
+    form.elements.goalCategory.value = goal.name;
+    form.elements.goalNote.value = `Added savings for ${goal.name}`;
   }
 }
 
@@ -729,17 +860,34 @@ function updateRecurringControls() {
 function resetSpecialEntryDraft() {
   const form = $("#transaction-form");
   form.elements.amount.value = "";
-  form.elements.category.value = "";
   form.elements.note.value = "";
+  form.elements.emiAmount.value = "";
+  form.elements.emiCategory.value = "";
+  form.elements.emiNote.value = "";
+  form.elements.loanAmount.value = "";
+  form.elements.loanAmount.readOnly = false;
+  form.elements.loanCategory.value = "";
+  form.elements.loanNote.value = "";
+  form.elements.goalAmount.value = "";
+  form.elements.goalCategory.value = "";
+  form.elements.goalNote.value = "";
+  $("#goal-context").innerHTML = "";
 }
 
-function getTransactionType(entryKind, selectedType) {
-  if (entryKind === "emi-settlement" || entryKind === "goal-saving") return "expense";
-  if (entryKind === "loan-settlement") {
-    const loan = state.loans.find((item) => item.id === $("#transaction-form").elements.loanId.value);
-    return loan?.direction === "given" ? "income" : "expense";
+function setTransactionFieldRequirements(entryKind) {
+  const form = $("#transaction-form");
+  const fieldNames = ["amount", "categorySelect", "emiAmount", "loanAmount", "goalAmount"];
+  fieldNames.forEach((name) => {
+    if (form.elements[name]) form.elements[name].required = false;
+  });
+
+  if (entryKind === "regular") {
+    form.elements.amount.required = true;
+    form.elements.categorySelect.required = true;
   }
-  return selectedType;
+  if (entryKind === "emi-settlement") form.elements.emiAmount.required = true;
+  if (entryKind === "loan-settlement") form.elements.loanAmount.required = true;
+  if (entryKind === "goal-saving") form.elements.goalAmount.required = true;
 }
 
 function applySettlementSideEffects(record, direction) {
