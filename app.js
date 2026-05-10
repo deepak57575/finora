@@ -542,7 +542,7 @@ function getTransactionDraft(form, entryKind) {
   }
 
   return {
-    type: form.elements.type.value,
+    type: form.elements.transactionMode.value === "credit" ? "income" : "expense",
     amount: Number(form.elements.amount.value),
     category: form.elements.categorySelect.value,
     note: form.elements.note.value.trim(),
@@ -621,7 +621,10 @@ function bindModals() {
   });
   transactionForm.elements.goalId.addEventListener("change", fillFromSelectedSpecialEntry);
   transactionForm.elements.isRecurring.addEventListener("change", updateRecurringControls);
-  transactionForm.elements.type.addEventListener("change", populateCategoryOptions);
+  transactionForm.elements.transactionMode.addEventListener("change", () => {
+    transactionForm.elements.type.value = transactionForm.elements.transactionMode.value === "credit" ? "income" : "expense";
+    populateCategoryOptions();
+  });
 }
 
 function openCreateModal(modalId) {
@@ -655,6 +658,7 @@ function fillTransactionForm(item) {
   form.reset();
   populateSpecialEntryOptions();
   form.elements.id.value = item.id;
+  form.elements.transactionMode.value = item.type === "income" ? "credit" : "debit";
   form.elements.type.value = item.type || "expense";
   form.elements.entryKind.value = item.entryKind || "regular";
   form.elements.emiId.value = item.emiId || "";
@@ -792,7 +796,7 @@ function populateGoalOptions() {
 
 function populateCategoryOptions() {
   const form = $("#transaction-form");
-  const selectedType = form.elements.type.value || "expense";
+  const selectedType = form.elements.transactionMode.value === "credit" ? "income" : "expense";
   const matchingCategories = state.categories.filter((category) => category.type === selectedType);
   const fallbackCategories = state.categories.length ? state.categories : demoState.categories;
   const categories = matchingCategories.length ? matchingCategories : fallbackCategories;

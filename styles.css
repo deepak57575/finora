@@ -521,12 +521,12 @@ body.dark-theme .metric.accent {
 
 .form-panel {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .form-panel label {
   display: grid;
-  gap: 7px;
+  gap: 9px;
   color: var(--muted);
   font-size: 0.875rem;
   font-weight: 500;
@@ -535,7 +535,7 @@ body.dark-theme .metric.accent {
 .field-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .conditional-field,
