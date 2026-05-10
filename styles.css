@@ -521,12 +521,12 @@ body.dark-theme .metric.accent {
 
 .form-panel {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .form-panel label {
   display: grid;
-  gap: 7px;
+  gap: 9px;
   color: var(--muted);
   font-size: 0.875rem;
   font-weight: 500;
@@ -535,7 +535,7 @@ body.dark-theme .metric.accent {
 .field-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .conditional-field,
@@ -1099,5 +1099,569 @@ body.modal-open {
 
   h1 {
     font-size: 1.875rem;
+  }
+}
+
+/* ============================================
+   Mobile Dashboard Layout Styles
+   ============================================ */
+
+.mobile-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  padding-bottom: 100px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* 1. Top Navigation Bar (Header) */
+.mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+}
+
+.user-avatar svg {
+  width: 24px;
+  height: 24px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.greeting {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.username {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 2. Primary Hero Card */
+.hero-card {
+  background: linear-gradient(135deg, #e8f5d9 0%, #d4edc4 100%);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-theme .hero-card {
+  background: linear-gradient(135deg, #1a3d2e 0%, #152f24 100%);
+}
+
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-left {
+  flex: 1;
+}
+
+.hero-category {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.hero-category svg {
+  width: 16px;
+  height: 16px;
+}
+
+.hero-metric {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.progress-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 8;
+}
+
+body.dark-theme .ring-bg {
+  stroke: rgba(255, 255, 255, 0.15);
+}
+
+.ring-progress {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.ring-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* 3. Secondary Metric Row */
+.metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.metric-card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metric-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.metric-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.income-icon {
+  background: #e8f5d9;
+  color: #2d7a3e;
+}
+
+.expense-icon {
+  background: #ffe8e8;
+  color: #c95d63;
+}
+
+body.dark-theme .income-icon {
+  background: #1a3d2e;
+  color: #8fd69f;
+}
+
+body.dark-theme .expense-icon {
+  background: #3d1f22;
+  color: #ef8f98;
+}
+
+.metric-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-value strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.metric-value small {
+  font-size: 0.625rem;
+  color: var(--soft-muted);
+  text-transform: lowercase;
+}
+
+/* 4. Calendar Widget Strip */
+.calendar-widget {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.calendar-month {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.cal-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bg);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cal-nav-btn:hover {
+  background: var(--line);
+}
+
+.cal-nav-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cal-day:hover {
+  background: var(--bg);
+}
+
+.cal-day.selected {
+  background: var(--accent);
+}
+
+.cal-day-name {
+  font-size: 0.625rem;
+  color: var(--soft-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.cal-day.selected .cal-day-name {
+  color: var(--primary);
+}
+
+.cal-day-num {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cal-day.selected .cal-day-num {
+  color: var(--primary);
+}
+
+/* 5. List/Feed Section */
+.feed-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feed-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feed-item {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feed-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feed-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+}
+
+.feed-icon.grocery {
+  background: #fff4e6;
+}
+
+.feed-icon.salary {
+  background: #e8f5d9;
+}
+
+.feed-icon.transport {
+  background: #e6f0ff;
+}
+
+.feed-icon.entertainment {
+  background: #fce6f0;
+}
+
+body.dark-theme .feed-icon.grocery {
+  background: #3d2a1f;
+}
+
+body.dark-theme .feed-icon.salary {
+  background: #1a3d2e;
+}
+
+body.dark-theme .feed-icon.transport {
+  background: #1f2a3d;
+}
+
+body.dark-theme .feed-icon.entertainment {
+  background: #3d1f2e;
+}
+
+.feed-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.feed-title-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+
+.feed-subtext {
+  font-size: 0.625rem;
+  color: var(--soft-muted);
+  margin: 0;
+}
+
+.feed-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  font-size: 0.875rem;
+}
+
+.add-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: var(--primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.add-btn:hover {
+  transform: scale(1.1);
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+/* 6. Bottom Navigation Bar */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 12px 16px 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.nav-item-bot {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--soft-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-item-bot:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.nav-item-bot svg {
+  width: 24px;
+  height: 24px;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: -20px;
+}
+
+.fab-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.fab-button svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Responsive adjustments for mobile dashboard */
+@media (max-width: 480px) {
+  .mobile-dashboard {
+    padding: 12px;
+  }
+
+  .hero-metric {
+    font-size: 1.5rem;
+  }
+
+  .metric-value strong {
+    font-size: 1.125rem;
   }
 }
