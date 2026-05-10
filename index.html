@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Finora Finance Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Roboto:wght@300;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -44,6 +47,10 @@
           <button class="nav-item" data-section="goals" type="button">
             <span class="nav-icon">◎</span>
             <span>Saving Goals</span>
+          </button>
+          <button class="nav-item" data-section="categories" type="button">
+            <span class="nav-icon">◫</span>
+            <span>Categories</span>
           </button>
         </nav>
 
@@ -211,6 +218,21 @@
             <div id="goal-list" class="data-list"></div>
           </section>
         </section>
+
+        <section class="section-view" id="categories">
+          <div class="page-actions">
+            <button class="primary-button" data-open-modal="category-modal" data-mode="create" type="button">Add category</button>
+          </div>
+          <section class="panel list-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Categories</h2>
+                <p>Manage reusable categories for income and expenses</p>
+              </div>
+            </div>
+            <div id="category-list" class="data-list"></div>
+          </section>
+        </section>
       </main>
     </div>
 
@@ -225,74 +247,145 @@
         </div>
         <form class="form-panel" id="transaction-form">
           <input name="id" type="hidden" />
-          <div class="field-row">
-            <label>Type
-              <select name="type" required>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </label>
-            <label>Entry kind
+          <label>Entry kind
               <select name="entryKind" required>
                 <option value="regular">Regular entry</option>
                 <option value="emi-settlement">EMI settlement</option>
                 <option value="loan-settlement">Loan settlement</option>
                 <option value="goal-saving">Saving goal deposit</option>
               </select>
-            </label>
-          </div>
-          <label class="conditional-field" id="emi-select-field">Select EMI
-            <select name="emiId"></select>
           </label>
-          <div class="conditional-field" id="loan-select-field">
+
+          <div class="conditional-field" id="regular-entry-fields">
             <div class="field-row">
-              <label>Select loan
-                <select name="loanId"></select>
-              </label>
-              <label>Settlement
-                <select name="loanSettlementType">
-                  <option value="partial">Partial</option>
-                  <option value="full">Full</option>
+              <label>Type
+                <select name="type">
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
                 </select>
               </label>
+              <label>Amount
+                <input name="amount" type="number" min="1" step="1" placeholder="25000" />
+              </label>
             </div>
-          </div>
-          <label class="conditional-field" id="goal-select-field">Select saving goal
-            <select name="goalId"></select>
-          </label>
-          <div class="field-row">
-            <label>Amount
-              <input name="amount" type="number" min="1" step="1" placeholder="25000" required />
-            </label>
             <label>Category
-              <input name="category" type="text" placeholder="Salary, groceries, rent" required />
+              <select name="categorySelect"></select>
             </label>
-          </div>
-          <label>Note
-            <input name="note" type="text" placeholder="Optional detail" />
-          </label>
-          <div class="recurring-box">
-            <label class="checkbox-label">
-              <input name="isRecurring" type="checkbox" />
-              <span>Recurring payment</span>
+            <label>Note
+              <input name="note" type="text" placeholder="Optional detail" />
             </label>
-            <div class="recurring-settings" id="recurring-settings">
-              <div class="field-row">
-                <label>Repeats
-                  <select name="recurringUnit">
-                    <option value="day">Daily</option>
-                    <option value="week">Weekly</option>
-                    <option value="month" selected>Monthly</option>
-                    <option value="year">Yearly</option>
-                  </select>
-                </label>
-                <label>Every
-                  <input name="recurringInterval" type="number" min="1" step="1" value="1" />
-                </label>
+            <div class="recurring-box">
+              <label class="checkbox-label">
+                <input name="isRecurring" type="checkbox" />
+                <span>Recurring payment</span>
+              </label>
+              <div class="recurring-settings" id="recurring-settings">
+                <div class="field-row">
+                  <label>Repeats
+                    <select name="recurringUnit">
+                      <option value="day">Daily</option>
+                      <option value="week">Weekly</option>
+                      <option value="month" selected>Monthly</option>
+                      <option value="year">Yearly</option>
+                    </select>
+                  </label>
+                  <label>Every
+                    <input name="recurringInterval" type="number" min="1" step="1" value="1" />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
+
+          <div class="conditional-field" id="emi-select-field">
+            <label>Select EMI
+              <select name="emiId"></select>
+            </label>
+            <div class="field-row">
+              <label>Amount
+                <input name="emiAmount" type="number" readonly />
+              </label>
+              <label>Category
+                <input name="emiCategory" type="text" readonly />
+              </label>
+            </div>
+            <label>Note
+              <input name="emiNote" type="text" placeholder="Optional detail" />
+            </label>
+          </div>
+
+          <div class="conditional-field" id="loan-select-field">
+            <label>Select loan
+              <select name="loanId"></select>
+            </label>
+            <fieldset class="radio-group">
+              <legend>Settlement</legend>
+              <label><input name="loanSettlementType" type="radio" value="full" /> Full</label>
+              <label><input name="loanSettlementType" type="radio" value="partial" checked /> Partial</label>
+            </fieldset>
+            <div class="field-row">
+              <label>Amount
+                <input name="loanAmount" type="number" min="1" step="1" />
+              </label>
+              <label>Category
+                <input name="loanCategory" type="text" readonly />
+              </label>
+            </div>
+            <label>Note
+              <input name="loanNote" type="text" placeholder="Optional detail" />
+            </label>
+          </div>
+
+          <div class="conditional-field" id="goal-select-field">
+            <label>Select saving goal
+              <select name="goalId"></select>
+            </label>
+            <div class="goal-context" id="goal-context"></div>
+            <div class="field-row">
+              <label>Amount
+                <input name="goalAmount" type="number" min="1" step="1" placeholder="5000" />
+              </label>
+              <label>Category
+                <input name="goalCategory" type="text" readonly />
+              </label>
+            </div>
+            <label>Note
+              <input name="goalNote" type="text" placeholder="Optional detail" />
+            </label>
+          </div>
+
+          <input name="category" type="hidden" />
           <button class="primary-button" type="submit">Save entry</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="category-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Categories</p>
+            <h2 id="category-modal-title">Add category</h2>
+          </div>
+          <button class="icon-button" data-close-modal type="button" aria-label="Close">×</button>
+        </div>
+        <form class="form-panel" id="category-form">
+          <input name="id" type="hidden" />
+          <label>Name
+            <input name="name" type="text" placeholder="Groceries, rent, salary" required />
+          </label>
+          <div class="field-row">
+            <label>Category
+              <select name="type">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </label>
+            <label>Monthly budget
+              <input name="budget" type="number" min="0" step="1" placeholder="Optional" />
+            </label>
+          </div>
+          <button class="primary-button" type="submit">Save category</button>
         </form>
       </div>
     </div>
